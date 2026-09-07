@@ -9,7 +9,7 @@
 config JSON 格式:
   {
     "title": "爱美客 · 发布资产预览",
-    "subtitle": "成片 out/aimeike_final.mp4（4:13）",
+    "subtitle": "成片 out/final_爱美客_20260906-1530.mp4（4:13）",
     "titles": [
       {"kind": "数字钩子", "text": "...", "note": "抓涨跌幅度，抖音/B站通用"}
     ],
@@ -17,7 +17,7 @@ config JSON 格式:
     "intro": "……（简介正文，不含标签和免责）",
     "disclaimer": "以上为情景推演，不构成投资建议。",
     "covers": [
-      {"label": "横版 1280×720（B站）", "path": "cover_横版_16x9.png"}
+      {"label": "横版 1280×720（B站）", "path": "cover_横版_16x9_爱美客_20260906-1530.png"}
     ]
   }
 """

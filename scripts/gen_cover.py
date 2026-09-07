@@ -5,16 +5,21 @@
 
 用法:
   python gen_cover.py \
-      --title "爱美客能抄底吗？" \
-      --metric "93" --unit "元" \
-      --sub "从199跌到93 · 跌幅70% · 市盈率25.8倍" \
-      --size 1280x720 --out cover.png
+      --title "传统资产正在被重定价" \
+      --metric "8万亿" --unit "元" \
+      --sub "× 算力底座光纤化 · 中美五个产业信号" \
+      --size 1280x720 --accent gold \
+      --slug "传统资产重定价-算力光纤化"
 
 --size 支持 16:9(横版 B站) 与 9:16(竖版 抖音/视频号/小红书)。
 --accent 强调色：gold(默认) / red(涨) / green(跌)。
+--slug 内容概要：提供后自动拼「cover_横版_16x9|cover_竖版_9x16_概要_时间戳.png」，无需手写 --out；
+       不传 --slug 也不传 --out 时回退为 cover.png（向后兼容）。
 """
 import argparse
 import os
+import re
+from datetime import datetime
 
 from PIL import Image, ImageDraw, ImageFont
 
@@ -116,6 +121,19 @@ def make_cover(title, metric, unit, sub, size, accent, out):
     print(f'封面 -> {out}  {W}x{H}  ({os.path.getsize(out) / 1024:.0f} KB)')
 
 
+# 尺寸 → 文件名前缀（用于自动命名，区分横竖版）
+SIZE_LABEL = {
+    (1280, 720): "cover_横版_16x9",
+    (1080, 1920): "cover_竖版_9x16",
+}
+
+
+def slugify(s: str) -> str:
+    """把内容概要转成安全文件名片段：空白与文件系统非法字符 → '-'，去首尾连字符。"""
+    s = re.sub(r'[\s/\\:*?"<>|]+', '-', s)
+    return s.strip('-')
+
+
 if __name__ == '__main__':
     ap = argparse.ArgumentParser()
     ap.add_argument('--title', required=True)
@@ -124,8 +142,17 @@ if __name__ == '__main__':
     ap.add_argument('--sub', default='')
     ap.add_argument('--size', default='1280x720')
     ap.add_argument('--accent', default='gold', choices=list(ACCENTS))
-    ap.add_argument('--out', default='cover.png')
+    ap.add_argument('--out', default=None, help='自定义输出文件名（覆盖 slug 自动命名）')
+    ap.add_argument('--slug', default=None, help='内容概要；提供后自动拼「前缀_概要_时间戳.png」')
     args = ap.parse_args()
 
     w, h = map(int, args.size.split('x'))
-    make_cover(args.title, args.metric, args.unit, args.sub, (w, h), args.accent, args.out)
+    if args.out:
+        out = args.out
+    elif args.slug:
+        prefix = SIZE_LABEL.get((w, h), f"cover_{w}x{h}")
+        ts = datetime.now().strftime("%Y%m%d-%H%M")
+        out = f"{prefix}_{slugify(args.slug)}_{ts}.png"
+    else:
+        out = "cover.png"
+    make_cover(args.title, args.metric, args.unit, args.sub, (w, h), args.accent, out)

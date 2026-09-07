@@ -110,19 +110,34 @@ python scripts/gen_tts.py --voice zh-CN-YunxiNeural --rate -5%   # 男声云希�
 
 ### 5. 时间轴 + 渲染 + 混 BGM
 
-一键流水线（在工程根目录跑）：
+一键流水线（在工程根目录跑；`SLUG` 为内容概要，成片名自动带时间戳）：
 
 ```bash
-COMP=Video bash scripts/pipeline.sh
+COMP=Video SLUG="传统资产重定价-算力光纤化" bash scripts/pipeline.sh
 ```
 
 分步等价于：
 1. `gen_tts.py` → 口播 mp3
 2. `gen_narration.py` → narration.json（每段真实时长）
 3. `npx remotion render src/index.ts Video out/video.mp4 --concurrency=6`
-4. `mix_bgm.py out/video.mp4 vo/bgm/bgm.mp3 out/final.mp4`
+4. `mix_bgm.py out/video.mp4 vo/bgm/bgm.mp3 --slug "传统资产重定价-算力光纤化"` → `out/final_传统资产重定价-算力光纤化_<时间戳>.mp4`
 
-BGM 音量默认压到口播下 ~10dB（`mix_bgm.py` 里 `volume=-10dB` 可调）。选无强旋律的 House/Ambient 曲目（如 Mixkit 的 Autofahren），低音量下不抢人声。
+不传 `SLUG` 则成片仍输出 `out/final.mp4`（向后兼容）。BGM 音量默认压到口播下 ~10dB（`mix_bgm.py` 里 `volume=-10dB` 可调）。选无强旋律的 House/Ambient 曲目（如 Mixkit 的 Autofahren），低音量下不抢人声。
+
+## 文件命名规范（最终交付物必带「概要 + 时间戳」）
+
+成片和封面是**要拿出项目目录**的交付物（会复制到发布目录 / 上传平台），若文件名固定会互相覆盖。因此**必须带「内容概要 + 时间戳」**：
+
+| 交付物 | 命名模板 | 示例 |
+|---|---|---|
+| 成片 | `final_<概要>_<YYYYMMDD-HHMM>.mp4` | `final_传统资产重定价-算力光纤化_20260908-0138.mp4` |
+| 封面横版 | `cover_横版_16x9_<概要>_<YYYYMMDD-HHMM>.png` | `cover_横版_16x9_传统资产重定价-算力光纤化_20260908-0138.png` |
+| 封面竖版 | `cover_竖版_9x16_<概要>_<YYYYMMDD-HHMM>.png` | `cover_竖版_9x16_传统资产重定价-算力光纤化_20260908-0138.png` |
+
+- `<概要>` = 6~12 字中文短语，词间用 `-` 连接，不含空白和 `/ \ : * ? " < > |`
+- `<时间戳>` = 本地时间 `YYYYMMDD-HHMM`（精确到分钟，同一天多期不冲突）
+- **时间戳由脚本自动生成**：`mix_bgm.py --slug`、`gen_cover.py --slug` 只传概要，脚本内部拼时间戳，**不要手拼**（避免时区/格式错）
+- 中间产物（`out/video.mp4`、`public/vo/*.mp3`、`src/narration.json`）在各自项目目录内，不会跨期冲突，无需时间戳
 
 ## 发布模块（发到自媒体平台）
 
@@ -132,13 +147,14 @@ BGM 音量默认压到口播下 ~10dB（`mix_bgm.py` 里 `volume=-10dB` 可调�
 
 ```bash
 python scripts/gen_cover.py \
-    --title "爱美客能抄底吗？" \
-    --metric "93" --unit "元" \
-    --sub "从199跌到93 · 跌幅70% · 市盈率25.8倍" \
-    --size 1280x720 --accent gold --out cover.png
+    --title "传统资产正在被重定价" \
+    --metric "8万亿" --unit "元" \
+    --sub "× 算力底座光纤化 · 中美五个产业信号" \
+    --size 1280x720 --accent gold \
+    --slug "传统资产重定价-算力光纤化"
 ```
 
-`--size` 用 `1280x720`（横版 B站）或 `1080x1920`（竖版 抖音/视频号）；`--accent` 用 `gold`/`red`(涨)/`green`(跌)。
+传 `--slug`（内容概要）后，脚本自动按尺寸拼 `cover_横版_16x9_<概要>_<时间戳>.png` / `cover_竖版_9x16_<概要>_<时间戳>.png`，无需手写 `--out`。`--size` 用 `1280x720`（横版 B站）或 `1080x1920`（竖版 抖音/视频号）；`--accent` 用 `gold`/`red`(涨)/`green`(跌)。仍可用 `--out` 指定自定义文件名（覆盖 slug 自动命名）。
 
 整套发布资产一键预览：
 
@@ -165,7 +181,7 @@ python scripts/build_publish_page.py --config publish.json --out publish_preview
 1. `npx tsc --noEmit` 零错误
 2. 每段渲 1 帧 → 逐张肉眼确认字幕 ↔ 画面卡片对应
 3. 整片渲染后 `ffprobe` 确认：分辨率/帧率/时长 + 存在 aac 音轨
-4. `ffmpeg -i out/final.mp4 -af volumedetect -f null - 2>&1 | grep mean_volume`，正常 ≈ -16~-20dB、无削波
+4. `ffmpeg -i out/final_*.mp4 -af volumedetect -f null - 2>&1 | grep mean_volume`，正常 ≈ -16~-20dB、无削波（成片名带「概要+时间戳」，用通配符 `final_*.mp4`）
 5. `present_files` 交付
 
 ## 参考实现

@@ -5,15 +5,28 @@
 首尾淡入淡出。选无强旋律的 House/Ambient 曲目，低音量下不抢人声。
 
 用法:
-  python mix_bgm.py out/video.mp4 [bgm.mp3] [out/final.mp4]
+  python mix_bgm.py out/video.mp4 [bgm.mp3] [--out out/final.mp4]
+  python mix_bgm.py out/video.mp4 [bgm.mp3] --slug "传统资产重定价-算力光纤化"
+
+--slug 内容概要：提供后自动拼「final_概要_时间戳.mp4」（与 video 同目录），
+       无需手写 --out；两者都不传时回退 out/final.mp4（向后兼容）。
 """
+import argparse
 import os
+import re
 import subprocess
 import sys
+from datetime import datetime
 
 
 def root():
     return os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+
+def slugify(s: str) -> str:
+    """把内容概要转成安全文件名片段：空白与文件系统非法字符 → '-'，去首尾连字符。"""
+    s = re.sub(r'[\s/\\:*?"<>|]+', '-', s)
+    return s.strip('-')
 
 
 def probe_dur(path: str) -> float:
@@ -26,10 +39,24 @@ def probe_dur(path: str) -> float:
 
 
 def main() -> int:
+    ap = argparse.ArgumentParser()
+    ap.add_argument('video')
+    ap.add_argument('bgm', nargs='?', default=None)
+    ap.add_argument('--out', default=None, help='自定义输出文件（覆盖 slug 自动命名）')
+    ap.add_argument('--slug', default=None, help='内容概要；提供后自动拼「final_概要_时间戳.mp4」')
+    args = ap.parse_args()
+
     r = root()
-    video = sys.argv[1]
-    bgm = sys.argv[2] if len(sys.argv) > 2 else os.path.join(r, 'vo', 'bgm', 'bgm.mp3')
-    out = sys.argv[3] if len(sys.argv) > 3 else os.path.join(r, 'out', 'final.mp4')
+    video = args.video
+    bgm = args.bgm or os.path.join(r, 'vo', 'bgm', 'bgm.mp3')
+    if args.out:
+        out = args.out
+    elif args.slug:
+        out_dir = os.path.dirname(os.path.abspath(video))
+        ts = datetime.now().strftime("%Y%m%d-%H%M")
+        out = os.path.join(out_dir, f"final_{slugify(args.slug)}_{ts}.mp4")
+    else:
+        out = os.path.join(r, 'out', 'final.mp4')
 
     total = probe_dur(video)
     print(f'视频 {total:.2f}s  BGM {bgm}')

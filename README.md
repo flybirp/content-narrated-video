@@ -175,11 +175,12 @@ BGM 默认压到口播下 ~10dB，选无强旋律的 House/Ambient 曲目。
 | 6 | 合规免责 | 固定模板（财经必加） |
 
 ```bash
-# 封面（纯设计型：数字锤 + 大字标题）
+# 封面（纯设计型：数字锤 + 大字标题；--slug 概要，文件名自动带时间戳）
 python scripts/gen_cover.py \
-    --title "爱美客能抄底吗？" --metric "93" --unit "元" \
-    --sub "从199跌到93 · 跌幅70% · 市盈率25.8倍" \
-    --size 1280x720 --accent gold --out cover.png
+    --title "传统资产正在被重定价" --metric "8万亿" --unit "元" \
+    --sub "× 算力底座光纤化 · 中美五个产业信号" \
+    --size 1280x720 --accent gold \
+    --slug "传统资产重定价-算力光纤化"
 
 # 整套发布资产一键预览
 python scripts/build_publish_page.py --config publish.json --out publish_preview.html
@@ -205,12 +206,12 @@ aimeike-video/
 │   └── scenes/               # 场景组件（卡片/大数字/柱状图/概率树…）
 ├── public/vo/<id>.mp3        # gen_tts.py 生成的口播
 ├── out/
-│   ├── video.mp4             # Remotion 渲染的纯画面
-│   └── final.mp4             # mix_bgm.py 混完 BGM 的成片
+│   ├── video.mp4             # Remotion 渲染的纯画面（中间产物，无时间戳）
+│   └── final_<概要>_<时间戳>.mp4   # mix_bgm.py 混完 BGM 的成片（如 final_爱美客_20260906-1530.mp4）
 └── publish/
     ├── publish.json          # 发布资产配置（标题/标签/简介/封面）
-    ├── cover_横版_16x9.png    # gen_cover.py 生成
-    ├── cover_竖版_9x16.png    # gen_cover.py 生成
+    ├── cover_横版_16x9_<概要>_<时间戳>.png  # gen_cover.py 生成（--slug 自动命名）
+    ├── cover_竖版_9x16_<概要>_<时间戳>.png  # gen_cover.py 生成
     └── publish_preview.html  # build_publish_page.py 生成
 ```
 

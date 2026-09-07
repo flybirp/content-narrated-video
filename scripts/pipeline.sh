@@ -4,6 +4,8 @@
 #
 # 用法（在 Remotion 工程根目录）：
 #   COMP=Video bash scripts/pipeline.sh
+#   COMP=Video SLUG="传统资产重定价-算力光纤化" bash scripts/pipeline.sh
+#   （传 SLUG=内容概要，成片名自动带「时间戳+概要」；不传则输出 out/final.mp4）
 set -u
 
 ROOT="${ROOT:-$(cd "$(dirname "$0")/.." && pwd)}"
@@ -24,6 +26,12 @@ echo "==[3/4] Remotion 渲染 =="
 "${ENV[@]}" npx remotion render src/index.ts "$COMP" out/video.mp4 --concurrency=6 || exit 1
 
 echo "==[4/4] 混入背景音乐 =="
-"${ENV[@]}" "$PY" scripts/mix_bgm.py out/video.mp4 vo/bgm/bgm.mp3 out/final.mp4 || exit 1
+MIX_ARGS=(out/video.mp4 vo/bgm/bgm.mp3)
+if [ -n "${SLUG:-}" ]; then
+  MIX_ARGS+=(--slug "$SLUG")
+else
+  MIX_ARGS+=(out/final.mp4)
+fi
+"${ENV[@]}" "$PY" scripts/mix_bgm.py "${MIX_ARGS[@]}" || exit 1
 
-echo "全部完成。成片 -> $ROOT/out/final.mp4"
+echo "全部完成。成片 -> $ROOT/out/final.mp4（若传 SLUG 则为 out/final_<概要>_<时间戳>.mp4）"
