@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """把背景音乐混进已渲染好的视频。
 
-成片方案：口播轨（-16 LUFS）保持原样，BGM 压到地板音量（比口播低约 10dB），
+成片方案：口播轨（-16 LUFS）保持原样，BGM 压到地板音量（比口播低约 12dB），
 首尾淡入淡出。选无强旋律的 House/Ambient 曲目，低音量下不抢人声。
 
 用法:
@@ -61,10 +61,10 @@ def main() -> int:
     total = probe_dur(video)
     print(f'视频 {total:.2f}s  BGM {bgm}')
 
-    # BGM：无限循环再截取视频长度，音量 -10dB，首尾淡入淡出。
+    # BGM：无限循环再截取视频长度，音量 -12dB，首尾淡入淡出。
     # -stream_loop -1 比 aloop 的 size 参数更稳。
     bgm_af = (
-        f"volume=-10dB,"
+        f"volume=-12dB,"
         f"afade=t=in:st=0:d=2,"
         f"afade=t=out:st={total - 4:.3f}:d=4"
     )

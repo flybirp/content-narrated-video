@@ -122,7 +122,7 @@ COMP=Video SLUG="传统资产重定价-算力光纤化" bash scripts/pipeline.sh
 3. `npx remotion render src/index.ts Video out/video.mp4 --concurrency=6`
 4. `mix_bgm.py out/video.mp4 vo/bgm/bgm.mp3 --slug "传统资产重定价-算力光纤化"` → `out/final_传统资产重定价-算力光纤化_<时间戳>.mp4`
 
-不传 `SLUG` 则成片仍输出 `out/final.mp4`（向后兼容）。BGM 音量默认压到口播下 ~10dB（`mix_bgm.py` 里 `volume=-10dB` 可调）。选无强旋律的 House/Ambient 曲目（如 Mixkit 的 Autofahren），低音量下不抢人声。
+不传 `SLUG` 则成片仍输出 `out/final.mp4`（向后兼容）。BGM 音量默认压到口播下 ~12dB（`mix_bgm.py` 里 `volume=-12dB` 可调）。**默认 BGM 用 Mixkit 免版权曲库的 Hazy After Hours（`Hazy-After-Hours.mp3`，Electronica，127s）**；选无强旋律的 House/Ambient 曲目，低音量下不抢人声。BGM 下载见 Mixkit（直链格式 `https://assets.mixkit.co/music/{id}/{id}.mp3`）。
 
 ## 文件命名规范（最终交付物必带「概要 + 时间戳」）
 
