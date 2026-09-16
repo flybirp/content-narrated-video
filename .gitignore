@@ -1,0 +1,10 @@
+# 构建/运行产物（本 skill 被复制到工程后才会产生）
+node_modules/
+__pycache__/
+*.pyc
+out/
+public/vo/
+*.mp4
+*.mp3
+.env
+.DS_Store

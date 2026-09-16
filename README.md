@@ -88,7 +88,7 @@ content-narrated-video/
     ├── gen_narration.py         # ffprobe 测时长 → narration.json
     ├── mix_bgm.py               # BGM 混音（压到口播下 ~10dB）
     ├── pipeline.sh              # 一键流水线
-    ├── gen_cover.py             # 纯设计型封面（数字锤 + 大字标题）
+    ├── gen_cover.py             # 纯设计型封面（AI 自选最吸引人标题 + 大字标题，数字锤可选）
     └── build_publish_page.py    # 从 publish.json 生成发布资产预览页
 ```
 
@@ -175,7 +175,7 @@ BGM 默认压到口播下 ~10dB，选无强旋律的 House/Ambient 曲目。
 | 6 | 合规免责 | 固定模板（财经必加） |
 
 ```bash
-# 封面（纯设计型：数字锤 + 大字标题；--slug 概要，文件名自动带时间戳）
+# 封面（纯设计型：AI 自选最吸引人标题 + 大字标题；--metric 可选，仅当所选标题带强数字时传；--slug 概要，文件名自动带时间戳）
 python scripts/gen_cover.py \
     --title "传统资产正在被重定价" --metric "8万亿" --unit "元" \
     --sub "× 算力底座光纤化 · 中美五个产业信号" \

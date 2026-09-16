@@ -13,6 +13,10 @@
 
 用法:
   python gen_tts.py [--voice zh-CN-XiaoxiaoNeural] [--rate +0%] [--skip-existing]
+
+语速建议:
+  短视频竖版（视频号/抖音 ≤60s）用云希男声 --rate +8% 更跟手、完播率更好；
+  横版长视频（B站）用 --rate -5% 更沉稳。也可把 vo/script.json 顶层 "rate" 写死。
 """
 import argparse
 import asyncio
